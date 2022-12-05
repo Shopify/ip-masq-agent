@@ -154,7 +154,7 @@ $(STAMPS): go-build
 # This runs the actual `go build` which updates all binaries.
 go-build: | $(BUILD_DIRS)
 	echo "# building for $(OS)/$(ARCH)"
-	docker run                                                  \
+	podman run                                                  \
 	    -i                                                      \
 	    --rm                                                    \
 	    -u $$(id -u):$$(id -g)                                  \
@@ -164,6 +164,7 @@ go-build: | $(BUILD_DIRS)
 	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
 	    -v $$(pwd)/.go/cache:/.cache                            \
 	    -v $$(pwd)/.go/pkg:/go/pkg                              \
+	    --ulimit nofile=5000:5000                               \
 	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 	    $(BUILD_IMAGE)                                          \
@@ -180,7 +181,7 @@ go-build: | $(BUILD_DIRS)
 shell: # @HELP launches a shell in the containerized build environment
 shell: | $(BUILD_DIRS)
 	echo "# launching a shell in the containerized build environment"
-	docker run                                                  \
+	podman run                                                  \
 	    -ti                                                     \
 	    --rm                                                    \
 	    -u $$(id -u):$$(id -g)                                  \
@@ -190,6 +191,7 @@ shell: | $(BUILD_DIRS)
 	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
 	    -v $$(pwd)/.go/cache:/.cache                            \
 	    -v $$(pwd)/.go/pkg:/go/pkg                              \
+	    --ulimit nofile=5000:5000                               \
 	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 	    $(BUILD_IMAGE)                                          \
@@ -211,7 +213,7 @@ $(LICENSES): | $(BUILD_DIRS)
 # The default builder does not support multi-arch.
 .PHONY: buildx-setup
 buildx-setup:
-	docker buildx inspect img-builder > /dev/null || docker buildx create --name img-builder --use
+	podman buildx inspect img-builder > /dev/null || podman buildx create --name img-builder --use
 
 CONTAINER_DOTFILES = $(foreach bin,$(BINS),.container-$(subst /,_,$(REGISTRY)/$(bin))-$(TAG))
 
@@ -242,19 +244,19 @@ $(CONTAINER_DOTFILES): buildx-setup
 	    -e 's|{ARG_OS}|$(OS)|g'                    \
 	    -e 's|{ARG_FROM}|$(BASEIMAGE)|g'           \
 	    Dockerfile.in > .dockerfile-$(BIN)-$(OS)_$(ARCH)
-	docker buildx build                      \
+	podman buildx build                      \
 	    --no-cache                           \
 	    --load --platform $(OS)/$(ARCH)      \
 	    -t $(REGISTRY)/$(BIN):$(TAG)         \
 	    -f .dockerfile-$(BIN)-$(OS)_$(ARCH)  \
 	    .
-	docker images -q $(REGISTRY)/$(BIN):$(TAG) > $@
+	podman images -q $(REGISTRY)/$(BIN):$(TAG) > $@
 	echo
 
 push: # @HELP pushes the container for one platform ($OS/$ARCH) to the defined registry
 push: container
 	for bin in $(BINS); do                     \
-	    docker push $(REGISTRY)/$$bin:$(TAG);  \
+	    podman push $(REGISTRY)/$$bin:$(TAG);  \
 	done
 	echo
 
@@ -282,7 +284,7 @@ version:
 
 test: # @HELP runs tests, as defined in ./build/test.sh
 test: | $(BUILD_DIRS)
-	docker run                                                  \
+	podman run                                                  \
 	    -i                                                      \
 	    --rm                                                    \
 	    -u $$(id -u):$$(id -g)                                  \
@@ -292,6 +294,7 @@ test: | $(BUILD_DIRS)
 	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
 	    -v $$(pwd)/.go/cache:/.cache                            \
 	    -v $$(pwd)/.go/pkg:/go/pkg                              \
+	    --ulimit nofile=5000:5000                               \
 	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 	    $(BUILD_IMAGE)                                          \
