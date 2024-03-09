@@ -299,6 +299,7 @@ func (m *MasqDaemon) syncMasqRules() error {
 	}
 
 	// masquerade all other traffic that is not bound for a --dst-type LOCAL destination
+	writeTcpMasqRule(lines)
 	writeMasqRule(lines)
 
 	writeLine(lines, "COMMIT")
@@ -338,6 +339,7 @@ func (m *MasqDaemon) syncMasqRulesIPv6() error {
 		}
 
 		// masquerade all other traffic that is not bound for a --dst-type LOCAL destination
+		writeTcpMasqRule(lines6)
 		writeMasqRule(lines6)
 
 		writeLine(lines6, "COMMIT")
@@ -385,8 +387,16 @@ func writeNonMasqRule(lines *bytes.Buffer, cidr string) {
 
 const masqRuleComment = `-m comment --comment "ip-masq-agent: outbound traffic is subject to MASQUERADE (must be last in chain)"`
 
+func writeTcpMasqRule(lines *bytes.Buffer) {
+	args := []string{masqRuleComment, "-j", "MASQUERADE", "-p", "tcp", "--to-ports", "32768-65535"}
+	if *randomFully {
+		args = append(args, "--random-fully")
+	}
+	writeRule(lines, utiliptables.Append, masqChain, args...)
+}
+
 func writeMasqRule(lines *bytes.Buffer) {
-	args := []string{masqRuleComment, "-j", "MASQUERADE", "--to-ports", "32768-65535"}
+	args := []string{masqRuleComment, "-j", "MASQUERADE"}
 	if *randomFully {
 		args = append(args, "--random-fully")
 	}
