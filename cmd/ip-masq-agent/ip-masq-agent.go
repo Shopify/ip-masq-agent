@@ -388,7 +388,7 @@ func writeNonMasqRule(lines *bytes.Buffer, cidr string) {
 const masqRuleComment = `-m comment --comment "ip-masq-agent: outbound traffic is subject to MASQUERADE (must be last in chain)"`
 
 func writeTcpMasqRule(lines *bytes.Buffer) {
-    args1 := []string{masqRuleComment, "-j", "MASQUERADE", "-p", "tcp", "-m", "statistic", "--mode", "random", "--probability", "0.5", "--to-ports", "1024-30000"}
+    args1 := []string{masqRuleComment, "-j", "MASQUERADE", "-p", "tcp", "-m", "statistic", "--mode", "random", "--probability", "0.5", "--to-ports", "1024-29999"}
     args2 := []string{masqRuleComment, "-j", "MASQUERADE", "-p", "tcp", "--to-ports", "32768-65535"}
 
     if *randomFully {
