@@ -310,6 +310,8 @@ func TestSyncMasqRules(t *testing.T) {
 -A ` + string(utiliptables.ChainPostrouting) + ` -m comment --comment ` +
 				fmt.Sprintf(postRoutingMasqChainCommentFormat, masqChain) + ` -m addrtype ! --dst-type LOCAL -j ` + string(masqChain) + `
 -A ` + string(masqChain) + ` ` + nonMasqRuleComment + ` -d 169.254.0.0/16 -j RETURN
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp -m statistic --mode random --probability 0.5 --to-ports 1024-29999` + wantRandomFully + `
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp --to-ports 32768-65535` + wantRandomFully + `
 -A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE` + wantRandomFully + `
 COMMIT
 `,
@@ -326,6 +328,8 @@ COMMIT
 -A ` + string(masqChain) + ` ` + nonMasqRuleComment + ` -d 10.0.0.0/8 -j RETURN
 -A ` + string(masqChain) + ` ` + nonMasqRuleComment + ` -d 172.16.0.0/12 -j RETURN
 -A ` + string(masqChain) + ` ` + nonMasqRuleComment + ` -d 192.168.0.0/16 -j RETURN
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp -m statistic --mode random --probability 0.5 --to-ports 1024-29999` + wantRandomFully + `
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp --to-ports 32768-65535` + wantRandomFully + `
 -A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE` + wantRandomFully + `
 COMMIT
 `,
@@ -350,6 +354,8 @@ COMMIT
 -A ` + string(masqChain) + ` ` + nonMasqRuleComment + ` -d 198.51.100.0/24 -j RETURN
 -A ` + string(masqChain) + ` ` + nonMasqRuleComment + ` -d 203.0.113.0/24 -j RETURN
 -A ` + string(masqChain) + ` ` + nonMasqRuleComment + ` -d 240.0.0.0/4 -j RETURN
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp -m statistic --mode random --probability 0.5 --to-ports 1024-29999` + wantRandomFully + `
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp --to-ports 32768-65535` + wantRandomFully + `
 -A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE` + wantRandomFully + `
 COMMIT
 `,
@@ -369,6 +375,8 @@ COMMIT
 				fmt.Sprintf(postRoutingMasqChainCommentFormat, masqChain) + ` -m addrtype ! --dst-type LOCAL -j ` + string(masqChain) + `
 -A ` + string(masqChain) + ` ` + nonMasqRuleComment + ` -d 169.254.0.0/16 -j RETURN
 -A ` + string(masqChain) + ` ` + nonMasqRuleComment + ` -d 10.244.0.0/16 -j RETURN
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp -m statistic --mode random --probability 0.5 --to-ports 1024-29999` + wantRandomFully + `
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp --to-ports 32768-65535` + wantRandomFully + `
 -A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE` + wantRandomFully + `
 COMMIT
 `,
@@ -411,6 +419,8 @@ func TestSyncMasqRulesIPv6(t *testing.T) {
 -A ` + string(utiliptables.ChainPostrouting) + ` -m comment --comment ` +
 				fmt.Sprintf(postRoutingMasqChainCommentFormat, masqChain) + ` -m addrtype ! --dst-type LOCAL -j ` + string(masqChain) + `
 -A ` + string(masqChain) + ` ` + nonMasqRuleComment + ` -d fe80::/10 -j RETURN
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp -m statistic --mode random --probability 0.5 --to-ports 1024-29999` + wantRandomFully + `
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp --to-ports 32768-65535` + wantRandomFully + `
 -A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE` + wantRandomFully + `
 COMMIT
 `,
@@ -430,6 +440,8 @@ COMMIT
 				fmt.Sprintf(postRoutingMasqChainCommentFormat, masqChain) + ` -m addrtype ! --dst-type LOCAL -j ` + string(masqChain) + `
 -A ` + string(masqChain) + ` ` + nonMasqRuleComment + ` -d fe80::/10 -j RETURN
 -A ` + string(masqChain) + ` ` + nonMasqRuleComment + ` -d fc00::/7 -j RETURN
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp -m statistic --mode random --probability 0.5 --to-ports 1024-29999` + wantRandomFully + `
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp --to-ports 32768-65535` + wantRandomFully + `
 -A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE` + wantRandomFully + `
 COMMIT
 `,
@@ -442,6 +454,8 @@ COMMIT
 :` + string(masqChain) + ` - [0:0]
 -A ` + string(utiliptables.ChainPostrouting) + ` -m comment --comment ` +
 				fmt.Sprintf(postRoutingMasqChainCommentFormat, masqChain) + ` -m addrtype ! --dst-type LOCAL -j ` + string(masqChain) + `
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp -m statistic --mode random --probability 0.5 --to-ports 1024-29999` + wantRandomFully + `
+-A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE -p tcp --to-ports 32768-65535` + wantRandomFully + `
 -A ` + string(masqChain) + ` ` + masqRuleComment + ` -j MASQUERADE` + wantRandomFully + `
 COMMIT
 `,
